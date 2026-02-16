@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ContentSplit — AI Content Repurposer API</title>
+  <meta name="description" content="Turn blog posts into Twitter threads, LinkedIn posts, newsletters & more. One API call, 6 platforms.">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a2e;line-height:1.6}
+    .container{max-width:1100px;margin:0 auto;padding:0 24px}
+    
+    /* Hero */
+    .hero{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:80px 0 100px}
+    .hero h1{font-size:3rem;font-weight:800;line-height:1.1;max-width:700px}
+    .hero p{font-size:1.2rem;margin-top:16px;opacity:.9;max-width:600px}
+    .hero-cta{display:inline-flex;gap:12px;margin-top:32px}
+    .hero-cta a{padding:14px 32px;border-radius:12px;font-weight:600;text-decoration:none;font-size:1rem;transition:.2s}
+    .btn-primary{background:#fff;color:#667eea}
+    .btn-secondary{border:2px solid rgba(255,255,255,.4);color:#fff}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.15)}
+    
+    /* Code */
+    .code-section{background:#f8f9ff;padding:80px 0}
+    .code-block{background:#1a1a2e;color:#e2e8f0;border-radius:16px;padding:32px;font-family:'Fira Code',monospace;font-size:.9rem;overflow-x:auto;max-width:700px;margin:32px auto 0}
+    .code-block .comment{color:#6b7280}
+    .code-block .string{color:#a78bfa}
+    .code-block .key{color:#60a5fa}
+    
+    /* Platforms */
+    .platforms{padding:80px 0}
+    .platforms h2{font-size:2rem;font-weight:700;text-align:center;margin-bottom:48px}
+    .platform-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
+    .platform-card{border:1px solid #e5e7eb;border-radius:16px;padding:28px;transition:.2s}
+    .platform-card:hover{border-color:#667eea;box-shadow:0 4px 20px rgba(102,126,234,.1)}
+    .platform-card h3{font-size:1.1rem;font-weight:600;margin-top:8px}
+    .platform-card p{color:#6b7280;font-size:.9rem;margin-top:8px}
+    .platform-icon{font-size:2rem}
+    
+    /* Pricing */
+    .pricing{background:#f8f9ff;padding:80px 0}
+    .pricing h2{font-size:2rem;font-weight:700;text-align:center;margin-bottom:48px}
+    .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;max-width:960px;margin:0 auto}
+    .price-card{background:#fff;border:2px solid #e5e7eb;border-radius:16px;padding:32px;text-align:center}
+    .price-card.popular{border-color:#667eea;position:relative}
+    .price-card.popular::before{content:'POPULAR';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#667eea;color:#fff;padding:4px 16px;border-radius:20px;font-size:.75rem;font-weight:600}
+    .price-card h3{font-size:1.2rem;font-weight:600}
+    .price-amount{font-size:2.5rem;font-weight:800;margin:16px 0 8px}
+    .price-amount span{font-size:1rem;color:#6b7280;font-weight:400}
+    .price-card ul{list-style:none;text-align:left;margin:24px 0;font-size:.9rem}
+    .price-card li{padding:6px 0;color:#4b5563}
+    .price-card li::before{content:'✓ ';color:#667eea;font-weight:600}
+    .price-btn{display:block;padding:12px;border-radius:10px;background:#667eea;color:#fff;text-decoration:none;font-weight:600;transition:.2s}
+    .price-btn:hover{background:#5a6fd6}
+    
+    /* Footer */
+    footer{padding:40px 0;text-align:center;color:#9ca3af;font-size:.85rem}
+    
+    @media(max-width:640px){
+      .hero h1{font-size:2rem}
+      .hero-cta{flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1>One blog post.<br>Six platforms.<br>Zero effort.</h1>
+      <p>ContentSplit turns your long-form content into platform-optimized social media posts with a single API call. Twitter threads, LinkedIn, newsletters, video scripts & more.</p>
+      <div class="hero-cta">
+        <a href="#pricing" class="btn-primary">Get Free API Key</a>
+        <a href="/docs" class="btn-secondary">API Docs →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Code Example -->
+  <section class="code-section">
+    <div class="container">
+      <h2 style="font-size:2rem;font-weight:700;text-align:center">Dead simple API</h2>
+      <div class="code-block">
+<span class="comment"># Turn a blog post into a Twitter thread + LinkedIn post</span>
+curl -X POST https://api.contentsplit.dev/api/repurpose \
+  -H <span class="string">"X-API-Key: cs_your_key"</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d '{
+    <span class="key">"content"</span>: <span class="string">"Your 2000-word blog post here..."</span>,
+    <span class="key">"targets"</span>: [<span class="string">"twitter_thread"</span>, <span class="string">"linkedin"</span>],
+    <span class="key">"tone"</span>: <span class="string">"professional"</span>
+  }'
+      </div>
+    </div>
+  </section>
+
+  <!-- Platforms -->
+  <section class="platforms">
+    <div class="container">
+      <h2>6 Platforms, One Call</h2>
+      <div class="platform-grid">
+        <div class="platform-card">
+          <div class="platform-icon">🐦</div>
+          <h3>Twitter/X Threads</h3>
+          <p>Hook-first threads with proper numbering, CTA, and character limits. Up to 20 tweets.</p>
+        </div>
+        <div class="platform-card">
+          <div class="platform-icon">💼</div>
+          <h3>LinkedIn Posts</h3>
+          <p>Professional posts optimized for the "see more" fold with engagement-driving questions.</p>
+        </div>
+        <div class="platform-card">
+          <div class="platform-icon">⚡</div>
+          <h3>NOSTR Notes</h3>
+          <p>Concise, hashtag-rich notes for the decentralized social web.</p>
+        </div>
+        <div class="platform-card">
+          <div class="platform-icon">📧</div>
+          <h3>Email Newsletters</h3>
+          <p>Subject lines, key takeaways, and CTAs ready for your email platform.</p>
+        </div>
+        <div class="platform-card">
+          <div class="platform-icon">🎬</div>
+          <h3>Video Scripts</h3>
+          <p>60-second scripts with hooks, B-roll suggestions, and CTAs for Shorts/Reels/TikTok.</p>
+        </div>
+        <div class="platform-card">
+          <div class="platform-icon">📝</div>
+          <h3>Summaries</h3>
+          <p>Clean 2-3 sentence summaries for meta descriptions, intros, or quick sharing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <h2>Simple, Transparent Pricing</h2>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <h3>Free</h3>
+          <div class="price-amount">$0<span>/mo</span></div>
+          <ul>
+            <li>50 requests/month</li>
+            <li>3 platforms (Twitter, LinkedIn, Summary)</li>
+            <li>5 req/minute rate limit</li>
+            <li>Rule-based fallback (no AI key needed)</li>
+          </ul>
+          <a href="/docs" class="price-btn" style="background:#e5e7eb;color:#4b5563">Start Free</a>
+        </div>
+        <div class="price-card popular">
+          <h3>Starter</h3>
+          <div class="price-amount">$9<span>/mo</span></div>
+          <ul>
+            <li>500 requests/month</li>
+            <li>All 6 platforms</li>
+            <li>30 req/minute rate limit</li>
+            <li>AI-powered generation</li>
+          </ul>
+          <a href="/api/signup" class="price-btn">Get Started</a>
+        </div>
+        <div class="price-card">
+          <h3>Pro</h3>
+          <div class="price-amount">$29<span>/mo</span></div>
+          <ul>
+            <li>5,000 requests/month</li>
+            <li>All 6 platforms</li>
+            <li>60 req/minute rate limit</li>
+            <li>Priority support</li>
+          </ul>
+          <a href="/api/signup" class="price-btn">Get Started</a>
+        </div>
+        <div class="price-card">
+          <h3>Enterprise</h3>
+          <div class="price-amount">$99<span>/mo</span></div>
+          <ul>
+            <li>50,000 requests/month</li>
+            <li>All 6 platforms</li>
+            <li>120 req/minute rate limit</li>
+            <li>Custom models & SLA</li>
+          </ul>
+          <a href="mailto:hello@contentsplit.dev" class="price-btn">Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>ContentSplit — AI Content Repurposer API | <a href="/docs" style="color:#667eea">API Docs</a> | <a href="https://github.com/Mint-Claw/content-split" style="color:#667eea">GitHub</a></p>
+    </div>
+  </footer>
+</body>
+</html>

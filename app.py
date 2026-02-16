@@ -8,16 +8,22 @@ Turns long-form content into platform-specific social media posts.
 import os
 import json
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
+
+from middleware import validate_api_key, track_usage, get_usage_stats, get_or_create_key, PLANS
 
 app = FastAPI(
     title="ContentSplit",
-    description="AI-powered content repurposing API",
-    version="1.0.0",
+    description="AI-powered content repurposing API. Turn long-form content into platform-optimized social posts.",
+    version="1.1.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
 app.add_middleware(
@@ -266,8 +272,59 @@ def _fallback_repurpose(platform: str, content: str, tone: str, max_tweets: int)
 
 # ── API Routes ─────────────────────────────────────────────────────────────
 
+class SignupRequest(BaseModel):
+    email: str = Field(..., description="Email address for API key")
+    plan: str = Field(default="free", description="Plan: free, starter, pro, enterprise")
+
+
+class SignupResponse(BaseModel):
+    api_key: str
+    plan: str
+    monthly_limit: int
+    message: str
+
+
+@app.post("/api/signup", response_model=SignupResponse)
+async def signup(req: SignupRequest):
+    """Get an API key. Free tier: 50 requests/month, no credit card required."""
+    if req.plan not in PLANS:
+        raise HTTPException(400, f"Invalid plan. Available: {list(PLANS.keys())}")
+    
+    api_key = get_or_create_key(req.email, req.plan)
+    plan_config = PLANS[req.plan]
+    
+    return SignupResponse(
+        api_key=api_key,
+        plan=req.plan,
+        monthly_limit=plan_config["limit"],
+        message=f"API key created! Add 'X-API-Key: {api_key}' header to your requests.",
+    )
+
+
+@app.get("/api/usage")
+async def usage(user: dict = Depends(validate_api_key)):
+    """Check your API usage and limits."""
+    return get_usage_stats(user["key"])
+
+
+@app.get("/api/pricing")
+async def pricing():
+    """View available plans and pricing."""
+    return {
+        "plans": {
+            name: {
+                "requests_per_month": config["limit"],
+                "rate_per_minute": config["rate_per_min"],
+                "platforms": config["platforms"],
+                "price_usd": config.get("price", 0),
+            }
+            for name, config in PLANS.items()
+        }
+    }
+
+
 @app.post("/api/repurpose", response_model=RepurposeResponse)
-async def repurpose_content(req: RepurposeRequest):
+async def repurpose_content(req: RepurposeRequest, user: dict = Depends(validate_api_key)):
     """Repurpose content for multiple platforms."""
     
     valid_targets = set(PLATFORM_PROMPTS.keys())
@@ -304,6 +361,9 @@ async def repurpose_content(req: RepurposeRequest):
                 common_tags = [w.strip(".,!?") for w in words if len(w) > 5][:5]
                 hashtags[platform_key] = [f"#{t}" for t in set(common_tags)]
     
+    # Track usage
+    track_usage(user.get("key", "anonymous"))
+    
     response_id = f"cs_{datetime.now().strftime('%Y%m%d%H%M%S')}_{hash(req.content[:50]) % 10000:04d}"
     
     return RepurposeResponse(
@@ -324,6 +384,15 @@ async def list_platforms():
         "tones": ["professional", "casual", "witty", "technical", "friendly"],
         "languages": ["en", "pt", "es"],
     }
+
+
+@app.get("/", response_class=HTMLResponse)
+async def landing_page():
+    """Landing page."""
+    landing = Path(__file__).parent / "landing.html"
+    if landing.exists():
+        return HTMLResponse(landing.read_text())
+    return HTMLResponse("<h1>ContentSplit API</h1><p><a href='/docs'>API Docs</a></p>")
 
 
 @app.get("/health")
